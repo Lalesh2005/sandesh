@@ -112,3 +112,29 @@ export const loginUser = async(req,res)=>{
         })
     }
 }
+
+
+export const getProfile =async (req,res)=>{
+    try{
+        const id = req.user.id;
+       const user = await User.findById(id).select("-password"); // password nahi laaayega ye 
+        if(!user){
+            return res.status(404).json({
+                success:false,
+                message:"User did not exist"
+            })
+        }
+        return res.status(200).json({
+            success:true,
+            user
+        })
+    }
+    catch(error)
+    {
+        return res.status(500).json({
+            success:false,
+            message:error.message
+        })
+    }
+}
+    
