@@ -1,0 +1,59 @@
+import User from "../models/User.js";
+import bcrypt from "bcrypt";
+
+export const registerUser = async (req, res) => {
+    try {
+        const { name, username, email, password } = req.body;
+
+        // Validation
+        if (!name || !username || !email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "All fields are required"
+            });
+        }
+
+        // Check existing username
+        const existingUser = await User.findOne({
+            $or: [{ email }, { username }]
+        });
+
+        if (existingUser) {
+            return res.status(400).json({
+                success: false,
+                message: "Username already exists"
+            });
+        }
+
+
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create user
+        const user = await User.create({
+            name,
+            username,
+            email,
+            password: hashedPassword
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: "User registered successfully",
+            user: {
+                _id: user._id,
+                name: user.name,
+                username: user.username,
+                email: user.email
+            }
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        });
+    }
+};
