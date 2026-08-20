@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import AuthRouter from "./routes/auth.route.js";
 import userRouter from "./routes/user.route.js";
+import chatRouter from "./routes/chat.route.js";
 
 const app = express();
 
@@ -17,5 +18,6 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", AuthRouter);
 app.use("/api/users", userRouter);
+app.use("/api/chats", chatRouter);
 
 export default app;
