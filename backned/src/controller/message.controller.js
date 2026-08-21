@@ -1,5 +1,6 @@
 import Chat from "../models/chat.js";
 import Message from "../models/message.js";
+import { getIO } from "../socket/socket.js";
 
 
 export const sendMessage = async (req, res) => {
@@ -41,6 +42,13 @@ export const sendMessage = async (req, res) => {
         const message = await Message.findById(newMessage._id)
             .populate("sender", "name username avatar");
 
+        const io = getIO();
+
+        io.to(chatId).emit(
+            "receive-message",
+            message
+        );
+
         return res.status(201).json({
             success: true,
             message
@@ -78,7 +86,7 @@ export const getMessages = async (req, res) => {
         const messages = await Message.find({
             chat: chatId
         })
-        .populate("sender", "name username avatar");
+            .populate("sender", "name username avatar");
 
         return res.status(200).json({
             success: true,
